@@ -1,0 +1,21 @@
+{
+    "name": "mahmodigithub/html-query-selector",
+    "description": "Select UI elements in PHP with straightforward syntax.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mahmodigit\\HtmlQuerySelector\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mahdi Mahmodi",
+            "email": "mahmodimahdi26@gmail.com"
+        }
+    ],
+    "require": {
+      "ext-dom": "*",
+        "ext-libxml": "*"
+    }
+}
