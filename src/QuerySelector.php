@@ -189,6 +189,46 @@ trait XpathQueryBuilder
     }
 
     /**
+     * Define attribute string contains condition
+     *
+     * @param string $name
+     * @param string $needle
+     * @return XpathQueryBuilder
+     */
+    public function attributeContains(string $name, string $needle)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(@{$name}, '{$needle}')",
+            'operator' => self::AND_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Define attribute string contains condition
+     *
+     * @param string $name
+     * @param string $needle
+     * @return XpathQueryBuilder
+     */
+    public function orAttributeContains(string $name, string $needle)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(@{$name}, '{$needle}')",
+            'operator' => self::AND_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
      * Select elements through predefined properties
      *
      * @return DOMNodeList|false
