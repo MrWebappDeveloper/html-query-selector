@@ -1,6 +1,6 @@
 <?php
 
-namespace Mahmodigit\HtmlQuerySelector;
+namespace MrWebappDeveloper\HtmlQuerySelector;
 
 use DOMDocument;
 use DOMNodeList;
