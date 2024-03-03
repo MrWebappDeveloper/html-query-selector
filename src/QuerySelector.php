@@ -1,6 +1,6 @@
 <?php
 
-namespace Mahmodigit\HtmlQuerySelector;
+namespace MrWebappDeveloper\HtmlQuerySelector;
 
 use DOMDocument;
 use DOMNodeList;
@@ -66,7 +66,7 @@ trait XpathQueryBuilder
     /**
      * @var array
      */
-    private array $whereAttributes;
+    private array $conditions;
 
     /**
      * @var string
@@ -120,7 +120,7 @@ trait XpathQueryBuilder
         if (!isset($this->currentTagName))
             $this->allTags();
 
-        $this->whereAttributes[$this->currentTagName][] = [
+        $this->conditions[$this->currentTagName][] = [
             'con' => "@{$name}" . ($value ? "='{$value}'" : ""),
             'operator' => self::AND_OPERATOR
         ];
@@ -140,9 +140,89 @@ trait XpathQueryBuilder
         if (!isset($this->currentTagName))
             $this->allTags();
 
-        $this->whereAttributes[$this->currentTagName][] = [
+        $this->conditions[$this->currentTagName][] = [
             'con' => "@{$name}" . ($value ? "='{$value}'" : ""),
             'operator' => self::OR_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Define string contains condition
+     *
+     * @param string $needle
+     * @param bool $recursively when it is true, it checks child tags too.
+     * @return XpathQueryBuilder
+     */
+    public function contains(string $needle, bool $recursively = true)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(" . ($recursively ? '., ' : '.') . "'{$needle}')",
+            'operator' => self::AND_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Define string contains condition
+     *
+     * @param string $needle
+     * @param bool $recursively when it is true, it checks child tags too.
+     * @return XpathQueryBuilder
+     */
+    public function orContains(string $needle, bool $recursively = true)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(" . ($recursively ? '., ' : '.') . "'{$needle}')",
+            'operator' => self::OR_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Define attribute string contains condition
+     *
+     * @param string $name
+     * @param string $needle
+     * @return XpathQueryBuilder
+     */
+    public function attributeContains(string $name, string $needle)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(@{$name}, '{$needle}')",
+            'operator' => self::AND_OPERATOR
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Define attribute string contains condition
+     *
+     * @param string $name
+     * @param string $needle
+     * @return XpathQueryBuilder
+     */
+    public function orAttributeContains(string $name, string $needle)
+    {
+        if (!isset($this->currentTagName))
+            $this->allTags();
+
+        $this->conditions[$this->currentTagName][] = [
+            'con' => "contains(@{$name}, '{$needle}')",
+            'operator' => self::AND_OPERATOR
         ];
 
         return $this;
@@ -192,7 +272,7 @@ trait XpathQueryBuilder
         foreach ($this->tags as $name => $scope) {
             $query .= $scope . (str_contains($name, '*') ? "*" : explode(self::UNIQUE_TAG_NAME_SEPARATOR, $name)[0]);
 
-            $query .= $this->tagWhereAttributeQuery($name);
+            $query .= $this->tagConditionsQuery($name);
         }
 
         $this->reset();
@@ -206,11 +286,11 @@ trait XpathQueryBuilder
      * @param string $tagName
      * @return string
      */
-    private function tagWhereAttributeQuery(string $tagName): string
+    private function tagConditionsQuery(string $tagName): string
     {
         $query = '';
 
-        if ($conditions = $this->whereAttributes[$tagName] ?? null)
+        if ($conditions = $this->conditions[$tagName] ?? null)
             $query .= '[';
 
         foreach ($conditions as $index => $condition) {
@@ -235,6 +315,6 @@ trait XpathQueryBuilder
     {
         unset($this->tags);
 
-        unset($this->whereAttributes);
+        unset($this->conditions);
     }
 }
